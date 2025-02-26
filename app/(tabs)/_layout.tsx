@@ -8,7 +8,7 @@ export default function TabsLayout() {
                 name="index"
                 options={{
                     title: "Home",
-                    tabBarIcon: ({ color }) => <Ionicons name="home" color={color} size={18} />
+                    tabBarIcon: ({ color }) => <Ionicons name="home" color={color} size={24} />
                 }}
             />
             <Tabs.Screen
@@ -16,7 +16,7 @@ export default function TabsLayout() {
                 options={{
                     title: "Sightings",
                     headerShown: false,
-                    tabBarIcon: ({ color }) => <Ionicons name="eye" color={color} size={18} />
+                    tabBarIcon: ({ color }) => <Ionicons name="eye" color={color} size={24} />
                 }}
             />
         </Tabs>
