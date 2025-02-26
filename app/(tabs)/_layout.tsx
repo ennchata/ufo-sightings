@@ -12,9 +12,10 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="sightings/index"
+                name="sightings"
                 options={{
-                    title: "All Sightings",
+                    title: "Sightings",
+                    headerShown: false,
                     tabBarIcon: ({ color }) => <Ionicons name="eye" color={color} size={18} />
                 }}
             />
