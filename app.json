@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ufo-sightings-final",
-    "slug": "ufo-sightings-final",
+    "name": "leaflet-map-test",
+    "slug": "leaflet-map-test",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
