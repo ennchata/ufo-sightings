@@ -17,4 +17,4 @@ export interface Location {
     witnessContact: string;
     locationString?: string;
   }
-  
+

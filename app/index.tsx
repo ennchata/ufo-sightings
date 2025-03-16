@@ -1,10 +1,8 @@
-"use dom";
-
-import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from "react-leaflet";
+import { useEffect, useState } from 'react';
+import { View, Text } from 'react-native';
+import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { LatLngTuple } from "leaflet";
-import { View, Text } from "react-native";
-import { useState, useEffect } from "react";
+import L, { LatLngTuple } from 'leaflet';
 
 const position: LatLngTuple = [51.505, -0.09];
 
@@ -27,7 +25,7 @@ const LocationHandler = ({ addMarker }: LocationHandlerProps) => {
     },
     click: (e) => {
       addMarker(e.latlng.lat, e.latlng.lng);
-    }
+    },
   });
 
   return null;
@@ -38,22 +36,22 @@ const Index = () => {
 
   useEffect(() => {
     fetch('https://sampleapis.assimilate.be/ufo/sightings')
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         console.log('Fetched data:', data); // Debugging log
         const points = data
           .filter((item: any) => item.location?.latitude && item.location?.longitude) // Ensure valid latitude and longitude
           .map((item: any) => ({
-            name: item.witnessName, // Choose a meaningful name field
+            name: 'Witness Name: ' + item.witnessName + '\nStatus: ' + item.status, // Choose a meaningful name field
             location: {
               latitude: item.location.latitude, // Correctly access latitude
-              longitude: item.location.longitude // Correctly access longitude
-            }
+              longitude: item.location.longitude, // Correctly access longitude
+            },
           }));
         console.log('Points of Interest:', points); // Debugging log
         setPointsOfInterest(points);
       })
-      .catch(error => console.error('Error fetching data:', error));
+      .catch((error) => console.error('Error fetching data:', error));
   }, []);
 
   const iconX = L.icon({
@@ -63,7 +61,7 @@ const Index = () => {
   });
 
   const addPointOfInterest = (lat: number, lng: number) => {
-    setPointsOfInterest([...pointsOfInterest, { name: "New Point", location: { latitude: lat, longitude: lng } }]);
+    setPointsOfInterest([...pointsOfInterest, { name: 'New Point', location: { latitude: lat, longitude: lng } }]);
   };
 
   console.log('Points of Interest in render:', pointsOfInterest); // Debugging log
@@ -80,9 +78,21 @@ const Index = () => {
       <LocationHandler addMarker={(lat, lng) => addPointOfInterest(lat, lng)} />
       {pointsOfInterest.length > 0 ? (
         pointsOfInterest.map((point, index) => (
-          <Marker key={index} position={[point.location.latitude, point.location.longitude]} icon={iconX}>
+          <Marker
+            key={index}
+            position={[point.location.latitude, point.location.longitude]}
+            icon={iconX}
+            eventHandlers={{
+              mouseover: (e) => {
+                e.target.openPopup();
+              },
+              mouseout: (e) => {
+                e.target.closePopup();
+              },
+            }}
+          >
             <Popup>
-              <View style={{ backgroundColor: 'white', padding: 10, width: 100 }}>
+              <View style={{ backgroundColor: 'white', padding: 10, width: 150 }}>
                 <Text>{point.name}</Text>
               </View>
             </Popup>
