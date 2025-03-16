@@ -18,6 +18,13 @@ export default function RootLayout() {
           tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="format-list-bulleted" color={color} size={size} />,
         }}
       />
+      <Tabs.Screen
+        name="details"
+        options={{
+          title: 'Sightings Details',
+          tabBarButton: () => null, // No tab button for details screen
+        }}
+      />
       </Tabs>
   )
 }
