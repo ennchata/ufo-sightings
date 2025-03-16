@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { UfoSighting } from '../types';
+import { useNavigation, useRouter } from 'expo-router';
 
 const API_URL = 'https://sampleapis.assimilate.be/ufo/sightings';
 const GEOCODING_API_URL = 'https://nominatim.openstreetmap.org/reverse'; // Gratis OpenStreetMap API
@@ -9,6 +10,8 @@ const List = () => {
   const [sightings, setSightings] = useState<UfoSighting[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const router = useRouter();
+  const navigation = useNavigation();
 
   // Functie om locatiegegevens op te halen via OpenStreetMap Nominatim API
   const getCityAndCountry = async (latitude: number, longitude: number) => {
@@ -54,8 +57,9 @@ const List = () => {
     return <ActivityIndicator size="large" style={styles.loader} />;
   }
 
-  const handleToggleExpand = (id: number) => {
-    setExpanded(expanded === id ? null : id);
+
+  const handleNavigateToDetails = (id: number) => {
+    router.push(`/details?id=${id}`); // Use router.push with query parameters
   };
 
   return (
@@ -69,7 +73,7 @@ const List = () => {
             <Text style={styles.description}>Location: {item.locationString}</Text>
             <Text style={styles.description}>Description: {item.description}</Text>
 
-            <TouchableOpacity onPress={() => handleToggleExpand(item.id)}>
+            <TouchableOpacity onPress={() => handleNavigateToDetails(item.id)}>
               <Text style={styles.moreInfoText}>Click for more info</Text>
             </TouchableOpacity>
 

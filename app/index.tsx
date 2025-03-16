@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLngTuple } from 'leaflet';
+import { useRouter } from 'expo-router';
 
 const position: LatLngTuple = [51.505, -0.09];
 
@@ -12,6 +13,7 @@ interface PointOfInterest {
     latitude: number;
     longitude: number;
   };
+  id: number; // Add id to PointOfInterest interface
 }
 
 interface LocationHandlerProps {
@@ -33,6 +35,7 @@ const LocationHandler = ({ addMarker }: LocationHandlerProps) => {
 
 const Index = () => {
   const [pointsOfInterest, setPointsOfInterest] = useState<PointOfInterest[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     fetch('https://sampleapis.assimilate.be/ufo/sightings')
@@ -47,6 +50,7 @@ const Index = () => {
               latitude: item.location.latitude, // Correctly access latitude
               longitude: item.location.longitude, // Correctly access longitude
             },
+            id: item.id, // Add id to each point
           }));
         console.log('Points of Interest:', points); // Debugging log
         setPointsOfInterest(points);
@@ -61,7 +65,7 @@ const Index = () => {
   });
 
   const addPointOfInterest = (lat: number, lng: number) => {
-    setPointsOfInterest([...pointsOfInterest, { name: 'New Point', location: { latitude: lat, longitude: lng } }]);
+    setPointsOfInterest([...pointsOfInterest, { name: 'New Point', location: { latitude: lat, longitude: lng }, id: Date.now() }]);
   };
 
   console.log('Points of Interest in render:', pointsOfInterest); // Debugging log
@@ -88,6 +92,9 @@ const Index = () => {
               },
               mouseout: (e) => {
                 e.target.closePopup();
+              },
+              click: () => {
+                router.push(`/details?id=${point.id}`); // Navigate to details screen on click
               },
             }}
           >
