@@ -48,6 +48,7 @@ const Index = () => {
         scrollWheelZoom={true}
         style={styles.map}
         attributionControl={false}
+        worldCopyJump={true}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {pointsOfInterest.map((point) => (
@@ -63,7 +64,7 @@ const Index = () => {
                 e.target.closePopup();
               },
               click: () => {
-                router.push(`/details?id=${point.id}`);
+                router.push(`./details?id=${point.id}`);
               },
             }}
           >
@@ -78,7 +79,7 @@ const Index = () => {
       </MapContainer>
 
       {/* Floating "Add Sighting" Button */}
-      <TouchableOpacity style={styles.floatingButton} onPress={() => router.push('/add-sighting')}>
+      <TouchableOpacity style={styles.floatingButton} onPress={() => router.push('./add-sighting')}>
         <Text style={styles.buttonText}>+</Text>
       </TouchableOpacity>
     </View>

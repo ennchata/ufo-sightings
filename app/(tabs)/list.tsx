@@ -58,7 +58,7 @@ const List = () => {
 
 
   const handleNavigateToDetails = (id: number) => {
-    router.push(`/details?id=${id}`);
+    router.push(`./../details?id=${id}`);
   };
 
   return (
