@@ -18,6 +18,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="format-list-bulleted" color={color} size={size} />,
         }}
       />
+      <Tabs.Screen
+        name="add-sighting"
+        options={{
+          title: 'Add Sighting',
+          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="plus" color={color} size={size} />,
+        }}
+      />
     </Tabs>
   );
 }

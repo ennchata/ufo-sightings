@@ -11,7 +11,6 @@ const List = () => {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
   const router = useRouter();
-  const navigation = useNavigation();
 
   const getCityAndCountry = async (latitude: number, longitude: number) => {
     try {
@@ -20,7 +19,7 @@ const List = () => {
       );
       const data = await response.json();
       const city = data.address == undefined ? "Unknown City" : data.address.city ?? data.address.town ?? data.address.village ?? 'Unknown City';
-      const country = data.address == undefined ? "Unknown Country" : data.address.country ?? 'Unknown Country';
+      const country = data.address == undefined ? "Unknown City" : data.address.country ?? 'Unknown Country';
       return `${city}, ${country}`;
     } catch (error) {
       console.error('Error fetching location:', error);
