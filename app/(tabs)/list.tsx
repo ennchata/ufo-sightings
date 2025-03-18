@@ -7,8 +7,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_URL = 'https://sampleapis.assimilate.be/ufo/sightings';
 const GEOCODING_API_URL = 'https://nominatim.openstreetmap.org/reverse'; // OpenStreetMap API
 
+type ExtendedSighting = UfoSighting & { custom: boolean };
+
 const List = () => {
-  const [sightings, setSightings] = useState<UfoSighting[]>([]);
+  const [sightings, setSightings] = useState<ExtendedSighting[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
   const router = useRouter();
@@ -31,18 +33,19 @@ const List = () => {
   const fetchSightings = async () => {
     try {
       const response = await fetch(API_URL);
-      const data: UfoSighting[] = await response.json();
+      const data: ExtendedSighting[] = await response.json();
 
       const sightingsWithLocation = await Promise.all(
         data.map(async (sighting) => {
           const locationString = await getCityAndCountry(sighting.location.latitude, sighting.location.longitude);
-          return { ...sighting, locationString };
+          return { ...sighting, locationString, custom: false };
         })
       );
 
       AsyncStorage.getItem('sightings').then((data: string | null) => {
         if (data) {
-          setSightings([...sightingsWithLocation, ...JSON.parse(data) as UfoSighting[]]);
+          let parsed = JSON.parse(data) as UfoSighting[];
+          setSightings([...sightingsWithLocation, ...parsed.map((sighting) => ({ ...sighting, custom: true }))]);
         } else {
           setSightings(sightingsWithLocation);
         }
@@ -62,8 +65,8 @@ const List = () => {
     return <ActivityIndicator size="large" style={styles.loader} />;
   }
 
-  const handleNavigateToDetails = (id: number) => {
-    router.push(`./../details?id=${id}`);
+  const handleNavigateToDetails = (id: number, custom: boolean) => {
+    router.push(custom ? `./../custom-details?id=${id}` : `./../details?id=${id}`);
   };
 
   return (
@@ -80,7 +83,7 @@ const List = () => {
             <Text style={styles.description}>Location: {item.locationString}</Text>
             <Text style={styles.description}>Description: {item.description}</Text>
 
-            <TouchableOpacity onPress={() => handleNavigateToDetails(item.id)}>
+            <TouchableOpacity onPress={() => handleNavigateToDetails(item.id, item.custom)}>
               <Text style={styles.moreInfoText}>Click for more info</Text>
             </TouchableOpacity>
 

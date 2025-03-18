@@ -7,18 +7,20 @@ import 'leaflet/dist/leaflet.css';
 import L, { LatLngTuple } from 'leaflet';
 import { useRouter } from 'expo-router';
 import { UfoSighting } from '../../types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const position: LatLngTuple = [51.505, -0.09];
+type ExtendedSighting = UfoSighting & { custom: boolean };
 
 const Index = () => {
-  const [pointsOfInterest, setPointsOfInterest] = useState<UfoSighting[]>([]);
+  const [pointsOfInterest, setPointsOfInterest] = useState<ExtendedSighting[]>([]);
   const router = useRouter();
 
   useEffect(() => {
     fetch('https://sampleapis.assimilate.be/ufo/sightings')
       .then((response) => response.json())
       .then((data) => {
-        const points = data
+        const points: ExtendedSighting[] = data
           .filter((item: any) => item.location?.latitude && item.location?.longitude)
           .map((item: any) => ({
             id: item.id,
@@ -29,8 +31,17 @@ const Index = () => {
             status: item.status,
             dateTime: item.dateTime,
             witnessContact: item.witnessContact,
+            custom: false,
           }));
-        setPointsOfInterest(points);
+
+        AsyncStorage.getItem('sightings').then((data: string | null) => {
+          if (data) { 
+            const customSightings = JSON.parse(data) as ExtendedSighting[];
+            setPointsOfInterest([...points, ...customSightings.map((sighting) => ({ ...sighting, custom: true }))]);
+          } else {
+            setPointsOfInterest(points);
+          }
+        });
       })
       .catch((error) => console.error('Error fetching data:', error));
   }, []);
@@ -65,7 +76,7 @@ const Index = () => {
                 e.target.closePopup();
               },
               click: () => {
-                router.push(`./details?id=${point.id}`);
+                router.push(point.custom ? `./custom-details?id=${point.id}` : `./details?id=${point.id}`);
               },
             }}
           >

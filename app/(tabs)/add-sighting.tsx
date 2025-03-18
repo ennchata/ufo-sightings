@@ -25,6 +25,10 @@ const AddSighting = () => {
   const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
+    getSavedSightings();
+  }, []);
+
+  const getSavedSightings = async () => {
     AsyncStorage.getItem("sightings").then((data: string | null) => {
       if (data) {
         sightings = JSON.parse(data) as UfoSighting[];
@@ -32,7 +36,7 @@ const AddSighting = () => {
         AsyncStorage.setItem("sightings", JSON.stringify([]));
       }
     });
-  }, []);
+  }
 
   const handleSubmit = () => {
     const lat = parseFloat(latitude);
@@ -54,6 +58,7 @@ const AddSighting = () => {
       location: { latitude: lat, longitude: lng },
     };
 
+    getSavedSightings();
     sightings.push(newSighting);
     AsyncStorage.setItem("sightings", JSON.stringify(sightings));
 
