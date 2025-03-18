@@ -1,7 +1,5 @@
-import { ReactNode } from "react";
 
 export interface Location {
-    city: ReactNode;
     latitude: number;
     longitude: number;
   }
