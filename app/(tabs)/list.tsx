@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { UfoSighting } from '../types';
+import { UfoSighting } from '../../types';
 import { useNavigation, useRouter } from 'expo-router';
 
 const API_URL = 'https://sampleapis.assimilate.be/ufo/sightings';
-const GEOCODING_API_URL = 'https://nominatim.openstreetmap.org/reverse'; // Gratis OpenStreetMap API
+const GEOCODING_API_URL = 'https://nominatim.openstreetmap.org/reverse'; // OpenStreetMap API
 
 const List = () => {
   const [sightings, setSightings] = useState<UfoSighting[]>([]);
@@ -13,7 +13,6 @@ const List = () => {
   const router = useRouter();
   const navigation = useNavigation();
 
-  // Functie om locatiegegevens op te halen via OpenStreetMap Nominatim API
   const getCityAndCountry = async (latitude: number, longitude: number) => {
     try {
       const response = await fetch(
@@ -59,7 +58,7 @@ const List = () => {
 
 
   const handleNavigateToDetails = (id: number) => {
-    router.push(`/details?id=${id}`); // Use router.push with query parameters
+    router.push(`/details?id=${id}`);
   };
 
   return (

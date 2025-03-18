@@ -4,14 +4,13 @@ import { UfoSighting } from '../types';
 import { useLocalSearchParams } from 'expo-router';
 
 const API_URL = 'https://sampleapis.assimilate.be/ufo/sightings';
-const GEOCODING_API_URL = 'https://nominatim.openstreetmap.org/reverse'; // Gratis OpenStreetMap API
+const GEOCODING_API_URL = 'https://nominatim.openstreetmap.org/reverse'; // OpenStreetMap API
 
 const Details = () => {
-  const { id } = useLocalSearchParams(); // Get the sighting ID from the URL query string
+  const { id } = useLocalSearchParams();
   const [sighting, setSighting] = useState<UfoSighting | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Functie om locatiegegevens op te halen via OpenStreetMap Nominatim API
   const getCityAndCountry = async (latitude: number, longitude: number) => {
     try {
       const response = await fetch(
@@ -129,7 +128,7 @@ const styles = StyleSheet.create({
         height: 250,
         marginTop: 15,
         borderRadius: 8,
-        resizeMode: 'contain',  // This will ensure the entire image is visible
+        resizeMode: 'contain',
       },
   });
   
