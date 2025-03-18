@@ -17,6 +17,10 @@ const Index = () => {
   const router = useRouter();
 
   useEffect(() => {
+    fetchSightings();
+  }, []);
+
+  const fetchSightings = async () => {
     fetch('https://sampleapis.assimilate.be/ufo/sightings')
       .then((response) => response.json())
       .then((data) => {
@@ -44,7 +48,7 @@ const Index = () => {
         });
       })
       .catch((error) => console.error('Error fetching data:', error));
-  }, []);
+  }
 
   const iconX = L.icon({
     iconUrl: 'https://raw.githubusercontent.com/similonap/public_icons/refs/heads/main/location-pin.png',
@@ -55,6 +59,9 @@ const Index = () => {
   return (
     <View style={{ flex: 1 }}>
       {/* Map */}
+      <TouchableOpacity
+              onPress={() => { fetchSightings(); }}
+            ><Text style={styles.moreInfoText}>Reload List</Text></TouchableOpacity>
       <MapContainer
         center={{ lat: 51.505, lng: -0.09 }}
         zoom={3}
@@ -90,10 +97,10 @@ const Index = () => {
         ))}
       </MapContainer>
 
-      {/* Floating "Add Sighting" Button */}
+      {/* Floating "Add Sighting" Button
       <TouchableOpacity style={styles.floatingButton} onPress={() => router.push('./add-sighting')}>
         <Text style={styles.buttonText}>+</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -103,7 +110,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
-    top: 0,
+    top: 24,
     left: 0,
   },
   floatingButton: {
@@ -127,6 +134,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#fff',
     fontWeight: 'bold',
+  },
+  moreInfoText: {
+    fontSize: 14,
+    color: '#007BFF',
+    marginTop: 5,
   },
 });
 

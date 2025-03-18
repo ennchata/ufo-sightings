@@ -22,7 +22,7 @@ const List = () => {
       );
       const data = await response.json();
       const city = data.address == undefined ? "Unknown City" : data.address.city ?? data.address.town ?? data.address.village ?? 'Unknown City';
-      const country = data.address == undefined ? "Unknown City" : data.address.country ?? 'Unknown Country';
+      const country = data.address == undefined ? "Unknown Country" : data.address.country ?? 'Unknown Country';
       return `${city}, ${country}`;
     } catch (error) {
       console.error('Error fetching location:', error);
@@ -42,10 +42,16 @@ const List = () => {
         })
       );
 
-      AsyncStorage.getItem('sightings').then((data: string | null) => {
+      AsyncStorage.getItem('sightings').then(async (data: string | null) => {
         if (data) {
-          let parsed = JSON.parse(data) as UfoSighting[];
-          setSightings([...sightingsWithLocation, ...parsed.map((sighting) => ({ ...sighting, custom: true }))]);
+          const parsed = JSON.parse(data) as UfoSighting[];
+          const withLocation: ExtendedSighting[] = await Promise.all(
+            parsed.map(async (sighting) => {
+              const locationString = await getCityAndCountry(sighting.location.latitude, sighting.location.longitude);
+              return { ...sighting, locationString, custom: true }
+            })
+        );
+          setSightings([...sightingsWithLocation, ...withLocation]);
         } else {
           setSightings(sightingsWithLocation);
         }

@@ -3,8 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Button, Scr
 import { useRouter } from 'expo-router';
 import { UfoSighting } from '../../types';
 import { CameraView, CameraType, useCameraPermissions, CameraCapturedPicture } from 'expo-camera';
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddSighting = () => {
@@ -15,7 +13,6 @@ const AddSighting = () => {
   const [description, setDescription] = useState('');
   const [picture, setPicture] = useState('');
   const [status, setStatus] = useState<'confirmed' | 'unconfirmed'>('unconfirmed');
-  const [dateTime, setDateTime] = useState('');
   const [witnessContact, setWitnessContact] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
@@ -25,18 +22,12 @@ const AddSighting = () => {
   const cameraRef = useRef<CameraView>(null);
 
   useEffect(() => {
-    getSavedSightings();
-  }, []);
-
-  const getSavedSightings = async () => {
     AsyncStorage.getItem("sightings").then((data: string | null) => {
       if (data) {
         sightings = JSON.parse(data) as UfoSighting[];
-      } else {
-        AsyncStorage.setItem("sightings", JSON.stringify([]));
       }
     });
-  }
+  }, []);
 
   const handleSubmit = () => {
     const lat = parseFloat(latitude);
@@ -53,14 +44,20 @@ const AddSighting = () => {
       description,
       picture,
       status,
-      dateTime,
+      dateTime: new Date().toISOString(),
       witnessContact,
       location: { latitude: lat, longitude: lng },
     };
 
-    getSavedSightings();
     sightings.push(newSighting);
-    AsyncStorage.setItem("sightings", JSON.stringify(sightings));
+    AsyncStorage.getItem("sightings").then(async (data: string | null) => {
+      if (data) {
+        const json = await JSON.parse(data);
+        AsyncStorage.setItem("sightings", JSON.stringify([...json, newSighting]));
+      } else {
+        AsyncStorage.setItem("sightings", JSON.stringify([newSighting]));
+      }
+    });
 
     Alert.alert('Success', 'Sighting added successfully!');
     
@@ -68,12 +65,10 @@ const AddSighting = () => {
   };
 
   if (!cameraPermission) {
-    // Camera permissions are still loading.
     return <View />;
   }
 
   if (!cameraPermission.granted) {
-    // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
         { cameraPermission.granted === false && (
@@ -120,6 +115,14 @@ const AddSighting = () => {
       />
 
       <TextInput
+        style={styles.input}
+        placeholder="Witness Contact"
+        placeholderTextColor={'#ccc'}
+        value={witnessContact}
+        onChangeText={setWitnessContact}
+      />
+
+      <TextInput
         style={[styles.input, { height: 150 }]}
         placeholder="Description"
         placeholderTextColor={'#ccc'}
@@ -142,7 +145,7 @@ const AddSighting = () => {
         placeholderTextColor={'#ccc'}
         value={latitude}
         onChangeText={setLatitude}
-        keyboardType="numeric"
+        // keyboardType="numeric"
       />
 
       <TextInput
@@ -151,7 +154,7 @@ const AddSighting = () => {
         placeholderTextColor={'#ccc'}
         value={longitude}
         onChangeText={setLongitude}
-        keyboardType="numeric"
+        // keyboardType="numeric"
       />
 
       <CameraView style={styles.camera} facing={facing} ref={cameraRef} >
@@ -236,7 +239,7 @@ const styles = StyleSheet.create({
   },
   camera: {
     flex: 1,
-    height: 300,
+    height: 500,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
