@@ -1,13 +1,15 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Button, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { UfoSighting } from '../../types';
 import { CameraView, CameraType, useCameraPermissions, CameraCapturedPicture } from 'expo-camera';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddSighting = () => {
   const router = useRouter();
+  let sightings: UfoSighting[] = [];
 
   const [witnessName, setWitnessName] = useState('');
   const [description, setDescription] = useState('');
@@ -43,7 +45,9 @@ const AddSighting = () => {
       location: { latitude: lat, longitude: lng },
     };
 
-    console.log('New Sighting:', newSighting);
+    sightings.push(newSighting);
+    AsyncStorage.setItem("sightings", JSON.stringify(sightings));
+    
     Alert.alert('Success', 'Sighting added successfully!');
     
     router.back();
@@ -122,6 +126,16 @@ const AddSighting = () => {
       return null;
     }
   }
+
+  useEffect(() => {
+    AsyncStorage.getItem("sightings").then((data: string | null) => {
+      if (data) {
+        sightings = JSON.parse(data) as UfoSighting[];
+      } else {
+        AsyncStorage.setItem("sightings", JSON.stringify([]));
+      }
+    });
+  }, []);
 
   return (
     <ScrollView style={styles.container}>

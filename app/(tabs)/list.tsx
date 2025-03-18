@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { UfoSighting } from '../../types';
 import { useNavigation, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = 'https://sampleapis.assimilate.be/ufo/sightings';
 const GEOCODING_API_URL = 'https://nominatim.openstreetmap.org/reverse'; // OpenStreetMap API
@@ -47,6 +48,12 @@ const List = () => {
         setLoading(false);
       }
     };
+
+    AsyncStorage.getItem('sightings').then((data: string | null) => {
+      if (data) {
+        setSightings([...sightings, ...JSON.parse(data) as UfoSighting[]]);
+      }
+    });
 
     fetchSightings();
   }, []);
