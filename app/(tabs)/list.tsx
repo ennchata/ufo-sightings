@@ -19,8 +19,8 @@ const List = () => {
         `${GEOCODING_API_URL}?lat=${latitude}&lon=${longitude}&format=json`
       );
       const data = await response.json();
-      const city = data.address.city || data.address.town || data.address.village || 'Unknown City';
-      const country = data.address.country || 'Unknown Country';
+      const city = data.address == undefined ? "Unknown City" : data.address.city ?? data.address.town ?? data.address.village ?? 'Unknown City';
+      const country = data.address == undefined ? "Unknown Country" : data.address.country ?? 'Unknown Country';
       return `${city}, ${country}`;
     } catch (error) {
       console.error('Error fetching location:', error);

@@ -1,3 +1,5 @@
+"use dom"
+
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
@@ -48,7 +50,6 @@ const Index = () => {
         scrollWheelZoom={true}
         style={styles.map}
         attributionControl={false}
-        worldCopyJump={true}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {pointsOfInterest.map((point) => (
