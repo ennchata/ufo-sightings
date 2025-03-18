@@ -28,33 +28,33 @@ const List = () => {
     }
   };
 
+  const fetchSightings = async () => {
+    try {
+      const response = await fetch(API_URL);
+      const data: UfoSighting[] = await response.json();
+
+      const sightingsWithLocation = await Promise.all(
+        data.map(async (sighting) => {
+          const locationString = await getCityAndCountry(sighting.location.latitude, sighting.location.longitude);
+          return { ...sighting, locationString };
+        })
+      );
+
+      AsyncStorage.getItem('sightings').then((data: string | null) => {
+        if (data) {
+          setSightings([...sightingsWithLocation, ...JSON.parse(data) as UfoSighting[]]);
+        } else {
+          setSightings(sightingsWithLocation);
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching sightings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchSightings = async () => {
-      try {
-        const response = await fetch(API_URL);
-        const data: UfoSighting[] = await response.json();
-
-        const sightingsWithLocation = await Promise.all(
-          data.map(async (sighting) => {
-            const locationString = await getCityAndCountry(sighting.location.latitude, sighting.location.longitude);
-            return { ...sighting, locationString };
-          })
-        );
-        
-        setSightings(sightingsWithLocation);
-      } catch (error) {
-        console.error('Error fetching sightings:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    AsyncStorage.getItem('sightings').then((data: string | null) => {
-      if (data) {
-        setSightings([...sightings, ...JSON.parse(data) as UfoSighting[]]);
-      }
-    });
-
     fetchSightings();
   }, []);
 
@@ -62,13 +62,15 @@ const List = () => {
     return <ActivityIndicator size="large" style={styles.loader} />;
   }
 
-
   const handleNavigateToDetails = (id: number) => {
     router.push(`./../details?id=${id}`);
   };
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => { setLoading(true); fetchSightings(); }}
+      ><Text style={styles.moreInfoText}>Reload List</Text></TouchableOpacity>
       <FlatList
         data={sightings}
         keyExtractor={(item) => item.id.toString()}

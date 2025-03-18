@@ -22,8 +22,17 @@ const AddSighting = () => {
 
   const [facing, setFacing] = useState<CameraType>('back');
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-  const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
   const cameraRef = useRef<CameraView>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem("sightings").then((data: string | null) => {
+      if (data) {
+        sightings = JSON.parse(data) as UfoSighting[];
+      } else {
+        AsyncStorage.setItem("sightings", JSON.stringify([]));
+      }
+    });
+  }, []);
 
   const handleSubmit = () => {
     const lat = parseFloat(latitude);
@@ -47,7 +56,7 @@ const AddSighting = () => {
 
     sightings.push(newSighting);
     AsyncStorage.setItem("sightings", JSON.stringify(sightings));
-    
+
     Alert.alert('Success', 'Sighting added successfully!');
     
     router.back();
@@ -58,16 +67,10 @@ const AddSighting = () => {
     return <View />;
   }
 
-  if (!cameraPermission.granted || !mediaPermission?.granted) {
+  if (!cameraPermission.granted) {
     // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
-        { mediaPermission?.granted === false && (
-          <View>
-            <Text style={styles.message}>We need your permission to save the picture</Text>
-            <Button onPress={requestMediaPermission} title="Grant library permission" />
-          </View>
-        )}
         { cameraPermission.granted === false && (
           <View>
             <Text style={styles.message}>We need your permission to show the camera</Text>
@@ -91,7 +94,6 @@ const AddSighting = () => {
         }).then((picture: CameraCapturedPicture | undefined) => {
           if (picture) {
             setPicture(picture.uri);
-            saveToGallery(picture.uri);
           }
         });
       } catch (error) {
@@ -100,42 +102,6 @@ const AddSighting = () => {
       }
     }
   }
-
-  const saveToGallery = async (uri: string) => {
-    try {
-      // First, create a unique filename in the app's cache directory
-      const filename = `${FileSystem.cacheDirectory}photo-${Date.now()}.jpg`;
-      
-      // Copy the photo to the new location
-      await FileSystem.copyAsync({
-        from: uri,
-        to: filename,
-      });
-      
-      // Save the photo to the device's gallery
-      const asset = await MediaLibrary.createAssetAsync(filename);
-      
-      // Get the permanent URI for the saved photo
-      const savedUri = asset.uri;
-      setPicture(savedUri);
-
-      return savedUri;
-    } catch (error) {
-      console.error('Error saving photo:', error);
-      Alert.alert('Error', 'Failed to save photo to gallery');
-      return null;
-    }
-  }
-
-  useEffect(() => {
-    AsyncStorage.getItem("sightings").then((data: string | null) => {
-      if (data) {
-        sightings = JSON.parse(data) as UfoSighting[];
-      } else {
-        AsyncStorage.setItem("sightings", JSON.stringify([]));
-      }
-    });
-  }, []);
 
   return (
     <ScrollView style={styles.container}>
